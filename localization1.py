@@ -25,4 +25,8 @@ def msense(p, Z):
         #print p
     return p
 
+def move(p, U):
+    q = p[-U:] + p[:-U]
+    return q
+
 print msense(p, measurements)
