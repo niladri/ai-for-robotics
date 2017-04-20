@@ -12,8 +12,8 @@ pMiss = 0.2
 def sense(p, Z):
     q=[]
     for i in range(len(p)):
-        hit = (Z == world[i])
-        q.append(p[i] * (hit * pHit + (1-hit) * pMiss))
+        pZ = 0.6 if world[i] == Z else 0.2
+        q.append(p[i]*pZ)
     s = sum(q)
     for i in range(len(q)):
         q[i] = q[i] / s
@@ -24,9 +24,5 @@ def msense(p, Z):
         p = sense(p, measurements[i])
         #print p
     return p
-
-def move(p, U):
-    q = p[-U:] + p[:-U]
-    return q
 
 print msense(p, measurements)
