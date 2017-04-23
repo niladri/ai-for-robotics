@@ -21,6 +21,28 @@
 # bottom. If you uncomment them for testing, make sure you
 # re-comment them before you submit.
 
+# --------------
+# USER INSTRUCTIONS
+#
+# Write a function in the class robot called sense()
+# that takes self as input
+# and returns a list, Z, of the four bearings* to the 4
+# different landmarks. you will have to use the robot's
+# x and y position, as well as its orientation, to
+# compute this.
+#
+# *bearing is defined in the video
+# which accompanies this problem.
+#
+# For now, please do NOT add noise to your sense function.
+#
+# Please do not modify anything except where indicated
+# below.
+#
+# There are test cases provided at the bottom which you are
+# free to use. If you uncomment any of these cases for testing
+# make sure that you re-comment it before you submit.
+
 from math import *
 import random
 # --------
@@ -122,6 +144,24 @@ class robot:
         result.set(X, Y, theta)
         return result # make sure your move function returns an instance
                       # of the robot class with the correct coordinates.
+
+    # --------
+    # sense:
+    #   obtains bearings from positions
+    #
+    
+    def sense(self): #do not change the name of this function
+        Z = []
+
+        # ENTER CODE HERE
+        # HINT: You will probably need to use the function atan2()
+        for i in range(len(landmarks)):
+            lx = landmarks[i][1]
+            ly = landmarks[i][0]
+            bearing = (atan2(ly - self.y, lx - self.x) - self.orientation) % (2 * pi)
+            Z.append(bearing)
+
+        return Z #Leave this line here. Return vector Z of 4 bearings.
                       
     ############## ONLY ADD/MODIFY CODE ABOVE HERE ####################
         
@@ -204,4 +244,47 @@ class robot:
 ## out. Our testing program provides its own code for testing your
 ## move function with randomized motion data.
 
+## --------
+## TEST CASES: for sense
 
+
+
+##
+## 1) The following code should print the list [6.004885648174475, 3.7295952571373605, 1.9295669970654687, 0.8519663271732721]
+##
+##
+##length = 20.
+##bearing_noise  = 0.0
+##steering_noise = 0.0
+##distance_noise = 0.0
+##
+##myrobot = robot(length)
+##myrobot.set(30.0, 20.0, 0.0)
+##myrobot.set_noise(bearing_noise, steering_noise, distance_noise)
+##
+##print 'Robot:        ', myrobot
+##print 'Measurements: ', myrobot.sense()
+##
+
+## IMPORTANT: You may uncomment the test cases below to test your code.
+## But when you submit this code, your test cases MUST be commented
+## out. Our testing program provides its own code for testing your
+## sense function with randomized initial robot coordinates.
+    
+
+##
+## 2) The following code should print the list [5.376567117456516, 3.101276726419402, 1.3012484663475101, 0.22364779645531352]
+##
+##
+##length = 20.
+##bearing_noise  = 0.0
+##steering_noise = 0.0
+##distance_noise = 0.0
+##
+##myrobot = robot(length)
+##myrobot.set(30.0, 20.0, pi / 5.0)
+##myrobot.set_noise(bearing_noise, steering_noise, distance_noise)
+##
+##print 'Robot:        ', myrobot
+##print 'Measurements: ', myrobot.sense()
+##
