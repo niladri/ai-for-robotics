@@ -105,32 +105,6 @@ class robot:
 # resampled according to their weights.
 # Also, DO NOT MODIFY p.
 
-# Below code using cumulative weights
-# W = 0.0
-# for i in range(N):
-#     W += w[i]
-### Normalize
-# for i in range(N):
-#     w[i] = w[i]/W
-
-### Cumulative weights
-# cw = []
-# cw.append(w[0])
-# for i in range(1, N, 1):
-#    cw.append(cw[i-1] + w[i])
-
-# def findparticle(val):
-#     for i in range(N):
-#         if (val < cw[i]):
-#             return i
-
-# p3 = []
-# ## Resample
-# for i in range(N):
-#     val = random.random()
-#     index = findparticle(val)
-#     p3.append(p[index])
-
 # Below code is based on resampling wheel approach
 ####   DON'T MODIFY ANYTHING ABOVE HERE! ENTER/MODIFY CODE BELOW ####
 myrobot = robot()
