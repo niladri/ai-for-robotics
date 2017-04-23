@@ -99,6 +99,40 @@ class robot:
 #myrobot = myrobot.move(-pi/2, 10.0)
 #print myrobot.sense()
 
+
+#### DON'T MODIFY ANYTHING ABOVE HERE! ENTER CODE BELOW ####
+# You should make sure that p3 contains a list with particles
+# resampled according to their weights.
+# Also, DO NOT MODIFY p.
+
+# Below code using cumulative weights
+# W = 0.0
+# for i in range(N):
+#     W += w[i]
+### Normalize
+# for i in range(N):
+#     w[i] = w[i]/W
+
+### Cumulative weights
+# cw = []
+# cw.append(w[0])
+# for i in range(1, N, 1):
+#    cw.append(cw[i-1] + w[i])
+
+# def findparticle(val):
+#     for i in range(N):
+#         if (val < cw[i]):
+#             return i
+
+# p3 = []
+# ## Resample
+# for i in range(N):
+#     val = random.random()
+#     index = findparticle(val)
+#     p3.append(p[index])
+
+# Below code is based on resampling wheel approach
+####   DON'T MODIFY ANYTHING ABOVE HERE! ENTER/MODIFY CODE BELOW ####
 myrobot = robot()
 myrobot = myrobot.move(0.1, 5.0)
 Z = myrobot.sense()
@@ -115,49 +149,28 @@ for i in range(N):
     p2.append(p[i].move(0.1, 5.0))
 p = p2
 
-w = []
-for i in range(N):
-    w.append(p[i].measurement_prob(Z))
-
-
-#### DON'T MODIFY ANYTHING ABOVE HERE! ENTER CODE BELOW ####
-# You should make sure that p3 contains a list with particles
-# resampled according to their weights.
-# Also, DO NOT MODIFY p.
-
-W = 0.0
-for i in range(N):
-    W += w[i]
-# Normalize
-for i in range(N):
-    w[i] = w[i]/W
-
-# Cumulative weights
-cw = []
-cw.append(w[0])
-for i in range(1, N, 1):
-    cw.append(cw[i-1] + w[i])
-
-def findparticle(val):
+def get_weights(p):
+    w = []
     for i in range(N):
-        if (val < cw[i]):
-            return i
+        w.append(p[i].measurement_prob(Z))
+    return w
 
-p3 = []
-# Resample
-for i in range(N):
-    val = random.random()
-    index = findparticle(val)
-    p3.append(p[index])
+def get_probability(p):
+    p3 = []
+    index = int(random.random() * N)
+    beta = 0.0
+    w = get_weights(p)
+    mw = max(w)
+    for i in range(N):
+        beta += random.random() * 2.0 * mw
+        while beta > w[index]:
+            beta -= w[index]
+            index = (index + 1) % N
+        p3.append(p[index])
+    return p3
+    
+T = 10
+for i in range(T):
+    p = get_probability(p)
 
-# Below code is based on resampling wheel approach
-# beta = 0.0
-# wmax = max(w)
-# index = int(floor(random.random() * N))
-
-# for i in range(N):
-#     beta += random.random() * 2.0 * wmax
-#     while w[index] < beta:
-#         beta = beta - w[index]
-#         index = (index + 1)%N
-#     p3.append(p[index])
+print p #Leave this print statement for grading purposes!
