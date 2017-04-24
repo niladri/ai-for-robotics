@@ -66,12 +66,9 @@ def printGrid(mat):
     for i in range(len(mat)):
         print(mat[i])
         
-def isInsideGrid(row, col, rows, cols):
-    return (row >= 0 and row < rows and col >= 0 and col < cols)
-        
 def optimum_policy2D(grid, init, goal, cost):
     maxVal = 999
-    value = [[[maxVal for d in range(len(forward))] for col in range(len(grid[0]))] for row in range(len(grid))]
+    valueTable = [[[maxVal for d in range(len(forward))] for col in range(len(grid[0]))] for row in range(len(grid))]
     change = True
     
     rows = len(grid)
@@ -84,8 +81,8 @@ def optimum_policy2D(grid, init, goal, cost):
             for col in range(len(grid[0])):
                 for orientation in range(len(forward)):
                     if goal[0] == row and goal[1] == col:
-                        if value[row][col][orientation] > 0:
-                            value[row][col][orientation] = 0
+                        if valueTable[row][col][orientation] > 0:
+                            valueTable[row][col][orientation] = 0
 
                             change = True
 
@@ -96,49 +93,19 @@ def optimum_policy2D(grid, init, goal, cost):
                             newRow = row + moveStep[0]
                             newCol = col + moveStep[1]
 
-                            if isInsideGrid(newRow, newCol, rows, cols) and grid[newRow][newCol] == 0:
-                                newVal = value[newRow][newCol][newOrientation] + cost[a]
-                                if newVal < value[row][col][orientation]:
+                            if newRow >= 0 and newRow < rows and newCol >= 0 and newCol < cols and grid[newRow][newCol] == 0:
+                                newVal = valueTable[newRow][newCol][newOrientation] + cost[a]
+                                if newVal < valueTable[row][col][orientation]:
                                     change = True
-                                    value[row][col][orientation] = newVal
+                                    valueTable[row][col][orientation] = newVal
 
-    #printGrid(value)
-    policy = getPath(value, init, goal)
-    return policy
-
-def findNext(current, vt):
-    rows = len(vt)
-    cols = len(vt[0])
-    orientations = len(vt[0][0])
-    
-    row = current[0]
-    col = current[1]
-    orientation = current[2]
-    
-    nextState = []
-    actionIndex = -1
-    
-    for i in range(len(action)):
-        newOrientation = (orientation + action[i]) % len(forward)
-        moveStep = forward[newOrientation]
-        newRow = row + moveStep[0]
-        newCol = col + moveStep[1]
-        if (False == isInsideGrid(newRow, newCol, rows, cols)):
-            continue
-        # If action cost with current cost matches then it is an action in the path
-        currentCost = vt[row][col][orientation]
-        actionCost = cost[i]
-        newCost = vt[newRow][newCol][newOrientation]
-        if (currentCost - actionCost == newCost):
-            nextState = [newRow, newCol, newOrientation]
-            actionIndex = i
-    
-    return nextState, actionIndex
-    
-def getPath(valueTable, init, goal):
     path = [[' ' for col in range(len(valueTable[0]))] for row in range(len(valueTable))]
     current = init
     maxVal = 999
+    
+    rows = len(valueTable)
+    cols = len(valueTable[0])
+    orientations = len(valueTable[0][0])
     
     # If path does not exist
     if (valueTable[current[0]][current[1]][current[2]] == maxVal):
@@ -146,7 +113,27 @@ def getPath(valueTable, init, goal):
     
     path[goal[0]][goal[1]] = '*'
     while (current[0] != goal[0] or current[1] != goal[1]):
-        nextState, actionIndex = findNext(current, valueTable)
+        row = current[0]
+        col = current[1]
+        orientation = current[2]
+
+        nextState = []
+        actionIndex = -1
+
+        for i in range(len(action)):
+            newOrientation = (orientation + action[i]) % len(forward)
+            moveStep = forward[newOrientation]
+            newRow = row + moveStep[0]
+            newCol = col + moveStep[1]
+            if (False == (newRow >= 0 and newRow < rows and newCol >= 0 and newCol < cols)):
+                continue
+            # If action cost with current cost matches then it is an action in the path
+            currentCost = valueTable[row][col][orientation]
+            actionCost = cost[i]
+            newCost = valueTable[newRow][newCol][newOrientation]
+            if (currentCost - actionCost == newCost):
+                nextState = [newRow, newCol, newOrientation]
+                actionIndex = i
         path[current[0]][current[1]] = action_name[actionIndex]
         current = nextState
 
