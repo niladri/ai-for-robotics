@@ -91,7 +91,7 @@ def smooth(path, weight_data = 0.1, weight_smooth = 0.1, tolerance = 0.00001):
 #newpath = smooth(path)
 def printSmoothing(path, newpath):
     for i in range(len(path)):
-        print '['+ ', '.join('%.3f'%x for x in path[i]) +'] -> ['+ ', '.join('%.3f'%x for x in newpath[i]) +']'
+        print('['+ ', '.join('%.3f'%x for x in path[i]) +'] -> ['+ ', '.join('%.3f'%x for x in newpath[i]) +']')
 
 
 ##### TESTING ######
@@ -111,20 +111,20 @@ def close_enough(user_answer, true_answer, epsilon = 0.001):
 #
 def solution_check(newpath, answer):
     if type(newpath) != type(answer):
-        print "Error. You do not return a list."
+        print("Error. You do not return a list.")
         return False
     if len(newpath) != len(answer):
-        print 'Error. Your newpath is not the correct length.'
+        print('Error. Your newpath is not the correct length.')
         return False
     if len(newpath[0]) != len(answer[0]):
-        print 'Error. Your entries do not contain an (x, y) coordinate pair.'
+        print('Error. Your entries do not contain an (x, y) coordinate pair.')
         return False
     for i in range(len(newpath)): 
         for j in range(len(newpath[0])):
             if not close_enough(newpath[i][j], answer[i][j]):
-                print 'Error, at least one of your entries is not correct.'
+                print('Error, at least one of your entries is not correct.')
                 return False
-    print "Test case correct!"
+    print("Test case correct!")
     return True
 
 # --------------
