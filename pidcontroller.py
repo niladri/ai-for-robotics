@@ -1,20 +1,22 @@
 # -----------
 # User Instructions
 #
-# Implement a PD controller by running 100 iterations
+# Implement a P controller by running 100 iterations
 # of robot motion. The steering angle should be set
 # by the parameter tau so that:
 #
-# steering = -tau_p * CTE - tau_d * diff_CTE
-# where differential crosstrack error (diff_CTE)
-# is given by CTE(t) - CTE(t-1)
+# steering = -tau_p * CTE - tau_d * diff_CTE - tau_i * int_CTE
 #
-# Your code should print output that looks like
-# the output shown in the video.
+# where the integrated crosstrack error (int_CTE) is
+# the sum of all the previous crosstrack errors.
+# This term works to cancel out steering drift.
+#
+# Your code should print a list that looks just like
+# the list shown in the video.
 #
 # Only modify code at the bottom!
 # ------------
- 
+
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -111,40 +113,33 @@ class Robot(object):
 #
 # run - does a single control run
 
-# previous P controller
-def run_p(robot, tau, n=100, speed=1.0):
-    x_trajectory = []
-    y_trajectory = []
-    for i in range(n):
-        cte = robot.y
-        steer = -tau * cte
-        robot.move(steer, speed)
-        x_trajectory.append(robot.x)
-        y_trajectory.append(robot.y)
-    return x_trajectory, y_trajectory
-    
 robot = Robot()
 robot.set(0, 1, 0)
+robot.set_steering_drift(10.0 / 180.0 * np.pi)
 
-def run(robot, tau_p, tau_d, n=100, speed=1.0):
+def run(robot, tau_p, tau_d, tau_i, n=100, speed=1.0):
     x_trajectory = []
     y_trajectory = []
     prevCTE = robot.y
+    icte = 0.0
     for i in range(n):
         cte = robot.y
         dcte = cte - prevCTE
+        icte += cte
         steer = -tau_p * cte -tau_d * dcte 
+        steer = -tau_p * cte - tau_d * dcte - tau_i * icte
         robot.move(steer, speed)
         x_trajectory.append(robot.x)
         y_trajectory.append(robot.y)
         prevCTE = cte
         #print(robot, steer)
     return x_trajectory, y_trajectory
-    
-x_trajectory, y_trajectory = run(robot, 0.2, 3.0)
 
+
+x_trajectory, y_trajectory = run(robot, 0.2, 0.0, 0.004, 200)
 n = len(x_trajectory)
-plt.plot(x_trajectory, y_trajectory, 'g', label='PD controller')
+
+plt.plot(x_trajectory, y_trajectory, 'g', label='PID controller')
 plt.plot(x_trajectory, np.zeros(n), 'r', label='reference')
 plt.legend()
 plt.show()
