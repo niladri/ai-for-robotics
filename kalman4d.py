@@ -5,6 +5,7 @@
 # any provided code OR comments. Good luck!
 
 from math import *
+from matrix import *
 
 # Removed matrix class, take from kalman 2D
 
@@ -25,14 +26,14 @@ def filter(x, P):
         x = x + (K * y)
         P = (I - (K * H)) * P
     
-    print 'x= '
+    print('x= ')
     x.show()
-    print 'P= '
+    print('P= ')
     P.show()
 
 ########################################
 
-print "### 4-dimensional example ###"
+print("### 4-dimensional example ###")
 
 measurements = [[5., 10.], [6., 8.], [7., 6.], [8., 4.], [9., 2.], [10., 0.]]
 initial_xy = [4., 12.]
@@ -60,7 +61,7 @@ F =  matrix([[1., 0., dt, 0.], [0., 1., 0., dt], [0., 0., 1., 0.], [0., 0., 0., 
 H =  matrix([[1., 0., 0., 0.], [0., 1., 0., 0.]])
 # measurement function: reflect the fact that we observe x and y but not the two velocities
 
-R =  matrix([[0.1, 0.], [0., 0.1]])
+R =  matrix([[0.1, 0.0], [0.0, 0.1]])
 # measurement uncertainty: use 2x2 matrix with 0.1 as main diagonal
 
 I =  matrix([[1., 0., 0., 0.], [0., 1., 0., 0.], [0., 0., 1., 0.], [0., 0., 0., 1.]])
