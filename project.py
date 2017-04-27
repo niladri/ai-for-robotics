@@ -71,7 +71,7 @@ def estimate_next_pos(measurement, OTHER = None):
         if dtheta < -pi/2:
             dtheta += 2 * pi
         d = distance_between(measurement, previous_measurement)
-        #print("d: ", d, "dtheta: ", dtheta)
+        print("d: ", d, "dtheta: ", dtheta)
         orientation_estimate = orientation_current + dtheta
         count = state.count
         dList = state.dList
@@ -111,12 +111,9 @@ def next_move(hunter_position, hunter_heading, target_measurement, max_distance,
     #print(distance)
     
     # If distance > max_distance, plan for few steps ahead
-    #if distance > max_distance:
-        #xy_estimate, ignore = estimate_next_pos(xy_estimate, OTHER, True)
+    #if distance > max_distance and OTHER.count > 100:
+        #xy_estimate = get_step_n(OTHER, 3)
         #distance = distance_between(hunter_position, xy_estimate)
-    if distance > max_distance and OTHER.count > 10:
-        xy_estimate = get_step_n(OTHER, 3)
-        distance = distance_between(hunter_position, xy_estimate)
     
     distance = min(distance, max_distance)
     turning = angle_trunc(get_heading(hunter_position, xy_estimate) - hunter_heading)
@@ -150,7 +147,7 @@ def demo_grading(hunter_bot, target_bot, next_move_fcn, OTHER = None):
     """Returns True if your next_move_fcn successfully guides the hunter_bot
     to the target_bot. This function is here to help you understand how we 
     will grade your submission."""
-    max_distance = 0.98 * target_bot.distance # 1.94 is an example. It will change.
+    max_distance = 1.00 * target_bot.distance # 1.94 is an example. It will change.
     separation_tolerance = 0.02 * target_bot.distance # hunter must be within 0.02 step size to catch target
     caught = False
     ctr = 0
@@ -162,7 +159,7 @@ def demo_grading(hunter_bot, target_bot, next_move_fcn, OTHER = None):
         hunter_position = (hunter_bot.x, hunter_bot.y)
         target_position = (target_bot.x, target_bot.y)
         separation = distance_between(hunter_position, target_position)
-        #print("separation: ", separation, "tolerance: ", separation_tolerance)
+        print("separation: ", separation, "tolerance: ", separation_tolerance)
         if separation < separation_tolerance:
             print("You got it right! It took you ", ctr, " steps to catch the target.")
             caught = True
@@ -228,7 +225,7 @@ def demo_grading_v(hunter_bot, target_bot, next_move_fcn, OTHER = None):
     """Returns True if your next_move_fcn successfully guides the hunter_bot
     to the target_bot. This function is here to help you understand how we 
     will grade your submission."""
-    max_distance = 0.98 * target_bot.distance # 1.94 is an example. It will change.
+    max_distance = 1.00 * target_bot.distance # 1.94 is an example. It will change.
     separation_tolerance = 0.02 * target_bot.distance # hunter must be within 0.02 step size to catch target
     caught = False
     ctr = 0
@@ -305,12 +302,11 @@ def demo_grading_v(hunter_bot, target_bot, next_move_fcn, OTHER = None):
     return caught
 
 target = robot(0.0, 10.0, 0.0, 2*pi / 30, 1.5)
-measurement_noise = .05*target.distance
+measurement_noise = 2.0*target.distance # VERY NOISY!!
 target.set_noise(0.0, 0.0, measurement_noise)
-
 hunter = robot(-10.0, -10.0, 0.0)
 
-print(demo_grading(hunter, target, next_move))
+print(demo_grading_v(hunter, target, next_move))
 
 
 
