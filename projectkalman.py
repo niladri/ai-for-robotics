@@ -40,6 +40,7 @@ class trackstate:
         self.P = P
         self.count = cnt
         self.measurement = []
+        self.estimate = []
 
 # Using Kalman 5D
 # Using state vector [x, y, theta, dtheta, d]
@@ -68,7 +69,7 @@ def predict(x, P):
     # for the EKF just use the state transition formulas the transition matrix was built from
     x = matrix([[x0 + dist0 * cos(theta0 + dtheta0)],
                 [y0 + dist0 * sin(theta0 + dtheta0)],
-                [theta0 + dtheta0],
+                [angle_trunc(theta0 + dtheta0)],
                 [dtheta0], 
                 [dist0]])
 
@@ -133,6 +134,7 @@ def estimate_next_pos(measurement, OTHER = None):
     
     OTHER = state
     OTHER.measurement = measurement
+    OTHER.estimate = xy_estimate
     return xy_estimate, OTHER    
 
 def next_move(hunter_position, hunter_heading, target_measurement, max_distance, OTHER = None):
@@ -141,6 +143,9 @@ def next_move(hunter_position, hunter_heading, target_measurement, max_distance,
     # The OTHER variable is a place for you to store any historical information about
     # the progress of the hunt (or maybe some localization information). Your return format
     # must be as follows in order to be graded properly.
+    if OTHER:
+        print("error in previous estimate: ", distance_between(OTHER.estimate, target_measurement))
+    
     xy_estimate, OTHER = estimate_next_pos(target_measurement, OTHER)
     distance = distance_between(hunter_position, xy_estimate)
     
@@ -148,7 +153,7 @@ def next_move(hunter_position, hunter_heading, target_measurement, max_distance,
     if distance > max_distance and OTHER.count > 5:
         oldsteps = 0
         steps = int(ceil(distance/max_distance))
-        #print("steps required: ", steps, "hunter: ",  '[%.3f, %.3f]' % (hunter_position[0], hunter_position[1]))
+        print("steps required: ", steps, "hunter: ",  '[%.3f, %.3f]' % (hunter_position[0], hunter_position[1]))
         
         intercept_steps = 0
         # Find interception point if esists
@@ -169,7 +174,6 @@ def next_move(hunter_position, hunter_heading, target_measurement, max_distance,
         if intercept_steps == 0:
             #print("intercept not found")
             while True:
-                steps += 1
                 step_n_estimate = get_step_n(OTHER, steps)
                 #print("steps: ", steps, 'estimate [%.3f, %.3f]' % (xy_estimate[0], xy_estimate[1]))
                 distance_to_step_n = distance_between(hunter_position, step_n_estimate)
@@ -179,10 +183,11 @@ def next_move(hunter_position, hunter_heading, target_measurement, max_distance,
                     distance = distance_to_step_n
                     xy_estimate = step_n_estimate
                     break
+                steps += 1
     
     distance = min(distance, max_distance)
     turning = angle_trunc(get_heading(hunter_position, xy_estimate) - hunter_heading)
-    #print('turning: %.3f, [%.3f, %.3f]' % (turning, xy_estimate[0], xy_estimate[1]))
+    print('distance: %.3f, turning: %.3f, [%.3f, %.3f]' % (distance, turning, xy_estimate[0], xy_estimate[1]))
     
     #time.sleep(2)
         
@@ -191,7 +196,7 @@ def next_move(hunter_position, hunter_heading, target_measurement, max_distance,
 def get_step_n(OTHER, n):
     x = OTHER.x
     P = OTHER.P
-    for i in range(n):
+    for i in range(n-1):
         x, P = predict(x, P)
     
     return x.value[0][0], x.value[1][0]
@@ -342,9 +347,9 @@ def demo_grading_v(hunter_bot, target_bot, next_move_fcn, OTHER = None):
 
 # This is how we create a target bot. Check the robot.py file to understand
 # How the robot class behaves.
-target = robot(0.0, 10.0, 0.0, 2*pi / 50, 1.5)
-measurement_noise = .5*target.distance
+target = robot(0.0, 10.0, 0.0, 2*pi / 5, 1.5)
+measurement_noise = .05*target.distance
 target.set_noise(0.0, 0.0, measurement_noise)
-hunter = robot(-10.0, -10.0, 0.0)
+hunter = robot(2.0, 10.0, 0.0)
 
-print(demo_grading(hunter, target, next_move))
+print(demo_grading_v(hunter, target, next_move))
